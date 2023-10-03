@@ -27,6 +27,9 @@ vsftpd:
 	nvim /etc/hosts.allow
 	systemctl enable --now vsftpd.service
 
+package:
+
+
 install:
 	mkdir $(INSTALL_DIR)/etc/ftp-mirror
 	cp files/$(CONFIG) $(INSTALL_DIR)/etc/ftp-mirror/$(CONFIG)
