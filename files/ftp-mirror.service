@@ -1,0 +1,5 @@
+[Unit]
+Description="FTP Mirror"
+
+[Service]
+ExecStart=/usr/local/bin/ftp-mirror /usr/local/etc/ftp-mirror-config.yaml

@@ -1,0 +1,13 @@
+---
+dir: /srv/ftp
+ftps:
+- name: machine1
+  ip: 192.168.13.4
+  path: Documents/reports
+  user: user
+  password: password
+- name: machine2
+  ip: 192.168.13.5
+  path: Documents/reports
+  user: user
+  password: password

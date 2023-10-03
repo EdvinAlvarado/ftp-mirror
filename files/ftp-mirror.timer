@@ -1,0 +1,10 @@
+[Unit]
+Description="ftp mirror timer"
+
+[Timer]
+OnBootSec=5m
+OnBootActiveSec=5m
+Unit=ftp-mirror.service
+
+[Install]
+WantedBy=timers.target
