@@ -9,15 +9,15 @@ use std::{
     process::Command, rc::Rc,
 };
 
-fn setup_dir(config: config::Config) -> Result<(), io::Error> {
-    for ftp in config.ftps {
+fn setup_dir(config: &config::Config) -> Result<(), io::Error> {
+    for ftp in &config.ftps {
         let dir = format!("{}/{}", config.dir.display(), ftp.name);
         Command::new("mkdir").arg(dir).output()?;
     }
     Ok(())
 }
 
-fn write_netrc(ftps: Vec<config::Ftp>) -> Result<(), Box<dyn Error>> {
+fn write_netrc(ftps: &Vec<config::Ftp>) -> Result<(), Box<dyn Error>> {
 	let netrc_path = "/root/.netrc";
     let mut netrc = File::create(netrc_path)?;
     for ftp in ftps {
@@ -55,8 +55,8 @@ fn main() -> Result<(), MainError> {
 
     match args.command {
         Some(Commands::Setup) => {
-            setup_dir(config.clone())?;
-            write_netrc(config.ftps)?;
+            setup_dir(&config)?;
+            write_netrc(&config.ftps)?;
         }
         None => unreachable!(),
     }
