@@ -16,7 +16,7 @@ enum MirrorError {
     CommandError(#[from] io::Error),
 }
 
-fn ftp_mirror<P: AsRef<Path> + Send>(ftp_des: P, ftp: config::Ftp) -> Result<(), MirrorError> {
+fn ftp_mirror<P: AsRef<Path> + Send>(ftp_des: P, ftp: &config::Ftp) -> Result<(), MirrorError> {
     let args = [
         "-c",
         &format!("\"open {};", ftp.ip),
@@ -47,7 +47,7 @@ fn main() -> Result<(), MainError> {
     let mut threads = vec![];
     for ftp in config.ftps {
         let dir = ftp_dir.clone();
-        let thread = thread::spawn(move || ftp_mirror(dir.as_ref(), ftp));
+        let thread = thread::spawn(move || ftp_mirror(dir.as_ref(), &ftp));
         threads.push(thread);
     }
 
