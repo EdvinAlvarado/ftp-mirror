@@ -1,13 +1,17 @@
-# Dependencies is python v3, systemd, go, lftp, and zsh
-# New FTP servers can be added in the config.yaml file. 
-# Remember to rerun setup.sh when changing config.yaml.
+# Dependencies is systemd, lftp, rust
 
-INSTALL_DIR=/opt/bioquell-ftp-copier
+INSTALL_DIR=/usr/local
 SYSTEMD_DIR=/etc/systemd/system
+BUILD_DIR=ftp-mirror/target
+
+CONFIG=ftp-mirror-config.yaml
+SERVICE=ftp-mirror.service
+TIMER=ftp-mirror.timer
+EXE=ftp-mirror
+CLI=ftp-mirror-cli
 
 dependencies: debian vsftpd
 
-install: build enable clean
 
 uninstall: disable remove
 
@@ -23,27 +27,31 @@ vsftpd:
 	nvim /etc/hosts.allow
 	systemctl enable --now vsftpd.service
 
-build:
-	mkdir $(INSTALL_DIR)
-	cp opt/* $(INSTALL_DIR)
-	cd bioquell-go; go run gopkg.in/yaml.v3; go build -ldflags '-s -w'
-	cp bioquell-go/bioquell-ftp $(INSTALL_DIR)
-	$(INSTALL_DIR)/setup.sh
-	chmod 600 ~/.netrc
+install:
+	mkdir $(INSTALL_DIR)/etc/ftp-mirror
+	cp files/$(CONFIG) $(INSTALL_DIR)/etc/ftp-mirror/$(CONFIG)
+	cp files/$(SERVICE) $(INSTALL_DIR)/etc/ftp-mirror/$(SERVICE)
+	cp files/$(TIMER) $(INSTALL_DIR)/etc/ftp-mirror/$(TIMER)
+	cd ftp-mirror; cargo build -r
+	mkdir $(INSTALL_DIR)/bin/ftp-mirror
+	cp $(BUILD_DIR)/release/$(EXE) $(INSTALL_DIR)/bin/ftp-mirror/$(EXE)
+	cp $(BUILD_DIR)/release/$(CLI) $(INSTALL_DIR)/bin/ftp-mirror/$(CLI)
+
 
 clean:
-	rm bioquell-go/bioquell-ftp
+	rm -r $(BUILD_DIR)/release/
 
 enable:
-	ln -s $(INSTALL_DIR)/bioquell-ftp-copier.service $(SYSTEMD_DIR)/bioquell-ftp-copier.service
-	ln -s $(INSTALL_DIR)/bioquell-ftp-copier.timer $(SYSTEMD_DIR)/bioquell-ftp-copier.timer
-	systemctl enable --now bioquell-ftp-copier.timer
+	ln -s $(INSTALL_DIR)/etc/$(SERVICE) $(SYSTEMD_DIR)/$(SERVICE)
+	ln -s $(INSTALL_DIR)/etc/$(TIMER) $(SYSTEMD_DIR)/$(TIMER)
+	systemctl enable --now $(TIMER)
 
 disable:
-	systemctl stop bioquell-ftp-copier.timer
-	systemctl disable bioquell-ftp-copier.timer
-	rm $(SYSTEMD_DIR)/bioquell-ftp-copier.service
+	systemctl stop $(TIMER) 
+	systemctl disable $(TIMER) 
+	rm $(SYSTEMD_DIR)/$(SERVICE)
 
 remove:
-	rm -r $(INSTALL_DIR)
-	rm ~/.netrc
+	rm -r $(INSTALL_DIR)/etc/ftp-mirror
+	rm -r $(INSTALL_DIR)/bin/ftp-mirror
+	rm /root/.netrc
