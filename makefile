@@ -17,7 +17,7 @@ uninstall: disable remove
 
 
 debian:
-	apt install vsftpd zsh golang python3 python3-is-python git lftp ftp neovim
+	sudo apt install vsftpd git lftp ftp rustup 
 
 vsftpd:
 	#TODO add all ftp configs
@@ -27,18 +27,19 @@ vsftpd:
 	nvim /etc/hosts.allow
 	systemctl enable --now vsftpd.service
 
-package:
+package: build
+	tar cvfz ftp-mirror.tar.gz files/* ftp-mirror/target/release/$(EXE) ftp-mirror/target/release/$(CLI) makefile
 
+build:
+	cd ftp-mirror; cargo build -r
 
-install:
+install: build
 	mkdir $(INSTALL_DIR)/etc/ftp-mirror
 	cp files/$(CONFIG) $(INSTALL_DIR)/etc/ftp-mirror/$(CONFIG)
 	cp files/$(SERVICE) $(INSTALL_DIR)/etc/ftp-mirror/$(SERVICE)
 	cp files/$(TIMER) $(INSTALL_DIR)/etc/ftp-mirror/$(TIMER)
-	cd ftp-mirror; cargo build -r
-	mkdir $(INSTALL_DIR)/bin/ftp-mirror
-	cp $(BUILD_DIR)/release/$(EXE) $(INSTALL_DIR)/bin/ftp-mirror/$(EXE)
-	cp $(BUILD_DIR)/release/$(CLI) $(INSTALL_DIR)/bin/ftp-mirror/$(CLI)
+	cp $(BUILD_DIR)/release/$(EXE) $(INSTALL_DIR)/bin/$(EXE)
+	cp $(BUILD_DIR)/release/$(CLI) $(INSTALL_DIR)/bin/$(CLI)
 
 
 clean:
@@ -57,4 +58,5 @@ disable:
 remove:
 	rm -r $(INSTALL_DIR)/etc/ftp-mirror
 	rm -r $(INSTALL_DIR)/bin/ftp-mirror
+	rm -r $(INSTALL_DIR)/bin/ftp-mirror-cli
 	rm /root/.netrc

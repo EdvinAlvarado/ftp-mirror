@@ -5,7 +5,8 @@ use std::{
     error::Error,
     fs::File,
     io::{self, Write},
-    process::Command, sync::Arc, 
+    path::PathBuf,
+    process::Command, rc::Rc, sync::Arc, 
 };
 
 fn setup_dir(config: &config::Config) -> Result<(), io::Error> {
@@ -13,7 +14,6 @@ fn setup_dir(config: &config::Config) -> Result<(), io::Error> {
         let dir = format!("{}/{}", config.dir.display(), ftp.name);
         Command::new("mkdir").arg(dir).output()?;
     }
-	println!("Directories create on {}", config.dir.display());
     Ok(())
 }
 
@@ -26,7 +26,6 @@ fn write_netrc(ftps: &Vec<config::Ftp>) -> Result<(), Box<dyn Error>> {
         write!(netrc, "password {}\n\n", ftp.password)?;
     }
 	Command::new("chmod").args(["600", netrc_path]).output()?;
-	println!("/root/.netrc file created. WARNING: password are saved as plain text.");
     Ok(())
 }
 
@@ -37,7 +36,7 @@ struct Args {
     /// Path to config file.
     #[arg(short, long, default_value = "/usr/local/etc/ftp-mirror/ftp-mirror-config.yaml")]
     config: Arc<str>,
-    /// Enable and st]art service with the specified config.
+    /// Enable and start service with the specified config.
     #[command(subcommand)]
     command: Option<Commands>,
 }
@@ -46,6 +45,7 @@ struct Args {
 enum Commands {
     /// setups the netrc, timer, and service.
     Setup,
+	Edit,
 }
 
 fn main() -> Result<(), MainError> {
@@ -53,12 +53,13 @@ fn main() -> Result<(), MainError> {
 
     let config_rdr = File::open(args.config.as_ref())?;
     let config: config::Config = serde_yaml::from_reader(config_rdr)?;
-	
+
     match args.command {
         Some(Commands::Setup) => {
             setup_dir(&config)?;
             write_netrc(&config.ftps)?;
         },
+		Some(Commands::Edit) => {println!("{}", args.config.as_ref()); Command::new("$EDITOR").arg(args.config.as_ref()).output().expect("could not edit");},
         None => unreachable!(),
     }
 	println!("completed");
