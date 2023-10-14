@@ -24,13 +24,15 @@ fn ftp_mirror<P: AsRef<Path> + Send>(ftp_des: P, ftp: &config::Ftp) -> Result<()
         &format!("lcd {}/{};", ftp_des.as_ref().display(), ftp.name),
         "mirror -c\"",
     ];
+    let output = Command::new("lftp").args(args).output()?;
+    
     println!(
         "Completed copy: {}\t->\t{}/{}",
         ftp.ip,
         ftp_des.as_ref().display(),
         ftp.name
     );
-    let output = Command::new("lftp").args(args).output()?;
+    
     match output.status.code() {
         Some(0) => Ok(()),
         _ => Err(MirrorError::FtpError(
