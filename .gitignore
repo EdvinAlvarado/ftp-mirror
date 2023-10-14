@@ -15,3 +15,7 @@ Cargo.lock
 
 
 *tar.gz
+*.exe
+*.obj
+*.sum
+zig-cache/
