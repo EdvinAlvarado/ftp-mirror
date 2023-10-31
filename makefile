@@ -33,8 +33,8 @@ vsftpd:
 	nvim /etc/hosts.allow
 	systemctl enable --now vsftpd.service
 
-package: build
-	tar cvfz ftp-mirror.tar.gz files/* ftp-mirror/target/release/$(EXE) ftp-mirror/target/release/$(CLI) makefile
+package: 
+	tar cvfz ftp-mirror.tar.gz files/* ftp-mirror/src/* ftp-mirror/Cargo.toml makefile
 
 build:
 	cd ftp-mirror; cargo build -r
