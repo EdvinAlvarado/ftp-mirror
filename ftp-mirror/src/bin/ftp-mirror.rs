@@ -25,30 +25,20 @@ fn ftp_mirror<P: AsRef<Path> + Send>(ftp_des: P, ftp: &config::Ftp) -> Result<()
         "mirror -c\"",
     ];
     let output = Command::new("lftp").args(args).output()?;
-<<<<<<< HEAD
     
-=======
-
->>>>>>> 6a23ec271c2a72947e256a381a84e19571d01452
     println!(
         "Completed copy: {}\t->\t{}/{}",
         ftp.ip,
         ftp_des.as_ref().display(),
         ftp.name
     );
-<<<<<<< HEAD
     
     match output.status.code() {
-=======
-	
-	match output.status.code() {
->>>>>>> 6a23ec271c2a72947e256a381a84e19571d01452
         Some(0) => Ok(()),
         _ => Err(MirrorError::FtpError(
             String::from_utf8_lossy(&output.stdout).into_owned(),
         )),
     }
-
 }
 
 fn main() -> Result<(), MainError> {
