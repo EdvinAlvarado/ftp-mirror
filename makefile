@@ -10,14 +10,20 @@ TIMER=ftp-mirror.timer
 EXE=ftp-mirror
 CLI=ftp-mirror-cli
 
-dependencies: debian vsftpd
+# testing
+deb: build
+	mkdir -p debian/ftp-mirror$(INSTALL_DIR)/etc/ftp-mirror
+	mkdir -p debian/ftp-mirror$(INSTALL_DIR)/bin/
+	cp files/$(CONFIG) debian/ftp-mirror$(INSTALL_DIR)/etc/ftp-mirror/$(CONFIG)
+	cp files/$(SERVICE) debian/ftp-mirror$(INSTALL_DIR)/etc/ftp-mirror/$(SERVICE)
+	cp files/$(TIMER) debian/ftp-mirror$(INSTALL_DIR)/etc/ftp-mirror/$(TIMER)
+	cp $(BUILD_DIR)/release/$(EXE) debian/ftp-mirror$(INSTALL_DIR)/bin/$(EXE)
+	cp $(BUILD_DIR)/release/$(CLI) debian/ftp-mirror$(INSTALL_DIR)/bin/$(CLI)
+	cd debian; dpkg-deb --build ftp-mirror
 
-
-uninstall: disable remove
-
-
-debian:
-	sudo apt install vsftpd git lftp ftp rustup 
+# testing
+debinstall: deb
+	cd debian; dpkg -i ftp-mirror.deb
 
 vsftpd:
 	#TODO add all ftp configs
@@ -49,6 +55,8 @@ enable:
 	ln -s $(INSTALL_DIR)/etc/$(SERVICE) $(SYSTEMD_DIR)/$(SERVICE)
 	ln -s $(INSTALL_DIR)/etc/$(TIMER) $(SYSTEMD_DIR)/$(TIMER)
 	systemctl enable --now $(TIMER)
+
+uninstall: disable remove
 
 disable:
 	systemctl stop $(TIMER) 

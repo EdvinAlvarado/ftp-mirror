@@ -1,0 +1,8 @@
+Package: ftp-mirror
+Version: 0.5.0
+Maintainer: Edvin Alvarado
+Architecture: all
+Description: mirrors FTPs into one directory
+Depends: lftp, ftp
+Recommends: vsftpd
+Build-Depends: cargo, rustc
