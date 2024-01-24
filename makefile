@@ -52,8 +52,8 @@ clean:
 	rm -r $(BUILD_DIR)/release/
 
 enable:
-	ln -s $(INSTALL_DIR)/etc/$(SERVICE) $(SYSTEMD_DIR)/$(SERVICE)
-	ln -s $(INSTALL_DIR)/etc/$(TIMER) $(SYSTEMD_DIR)/$(TIMER)
+	ln -s $(INSTALL_DIR)/etc/ftp-mirror/$(SERVICE) $(SYSTEMD_DIR)/$(SERVICE)
+	ln -s $(INSTALL_DIR)/etc/ftp-mirror/$(TIMER) $(SYSTEMD_DIR)/$(TIMER)
 	systemctl enable --now $(TIMER)
 
 uninstall: disable remove
