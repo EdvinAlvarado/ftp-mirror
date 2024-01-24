@@ -5,7 +5,8 @@ use std::{
     error::Error,
     fs::File,
     io::{self, Write},
-    process::Command, sync::Arc, 
+    process::Command,
+    sync::Arc,
 };
 
 fn setup_dir(config: &config::Config) -> Result<(), io::Error> {
@@ -13,20 +14,20 @@ fn setup_dir(config: &config::Config) -> Result<(), io::Error> {
         let dir = format!("{}/{}", config.dir.display(), ftp.name);
         Command::new("mkdir").arg(dir).output()?;
     }
-	println!("Directories create on {}", config.dir.display());
+    println!("Directories created on {}", config.dir.display());
     Ok(())
 }
 
 fn write_netrc(ftps: &Vec<config::Ftp>) -> Result<(), Box<dyn Error>> {
-	let netrc_path = "/root/.netrc";
+    let netrc_path = "/root/.netrc";
     let mut netrc = File::create(netrc_path)?;
     for ftp in ftps {
         write!(netrc, "machine {}\n", ftp.ip)?;
         write!(netrc, "login {}\n", ftp.user)?;
         write!(netrc, "password {}\n\n", ftp.password)?;
     }
-	Command::new("chmod").args(["600", netrc_path]).output()?;
-	println!("/root/.netrc file created. WARNING: password are saved as plain text.");
+    Command::new("chmod").args(["600", netrc_path]).output()?;
+    println!("/root/.netrc file created. WARNING: password are saved as plain text.");
     Ok(())
 }
 
@@ -37,7 +38,7 @@ struct Args {
     /// Path to config file.
     #[arg(short, long, default_value = "/usr/local/etc/ftp-mirror/ftp-mirror-config.yaml")]
     config: Arc<str>,
-    /// Enable and st]art service with the specified config.
+    /// Enable and start service with the specified config.
     #[command(subcommand)]
     command: Option<Commands>,
 }
@@ -53,14 +54,14 @@ fn main() -> Result<(), MainError> {
 
     let config_rdr = File::open(args.config.as_ref())?;
     let config: config::Config = serde_yaml::from_reader(config_rdr)?;
-	
+
     match args.command {
         Some(Commands::Setup) => {
             setup_dir(&config)?;
             write_netrc(&config.ftps)?;
-        },
+        }
         None => unreachable!(),
     }
-	println!("completed");
+    println!("completed");
     Ok(())
 }
