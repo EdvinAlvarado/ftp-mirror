@@ -10,8 +10,8 @@ use std::{
 
 fn setup_dir(config: &config::Config) -> Result<(), io::Error> {
     for ftp in &config.ftps {
-        let dir = format!("{}/{}", config.dir.display(), ftp.name);
-        Command::new("mkdir").arg(dir).output()?;
+		let dir = config.dir.join(ftp.name.clone());
+		fs::create_dir(dir)?;
     }
 	println!("Directories create on {}", config.dir.display());
     Ok(())
@@ -25,7 +25,7 @@ fn write_netrc(ftps: &Vec<config::Ftp>) -> Result<(), Box<dyn Error>> {
         write!(netrc, "login {}\n", ftp.user)?;
         write!(netrc, "password {}\n\n", ftp.password)?;
     }
-	Command::new("chmod").args(["600", netrc_path]).output()?;
+	fs::set_permissions(netrc_path, fs::Permissions::from_mode(0o600))?;
 	println!("/root/.netrc file created. WARNING: password are saved as plain text.");
     Ok(())
 }
