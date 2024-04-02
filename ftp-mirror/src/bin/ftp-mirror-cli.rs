@@ -2,10 +2,7 @@ use clap::{Parser, Subcommand};
 use config;
 use main_error::MainError;
 use std::{
-    error::Error,
-    fs::File,
-    io::{self, Write},
-    process::Command, sync::Arc, 
+    error::Error, fs::{self, File}, io::{self, Write}, os::unix::fs::PermissionsExt, sync::Arc 
 };
 
 fn setup_dir(config: &config::Config) -> Result<(), io::Error> {
@@ -13,7 +10,7 @@ fn setup_dir(config: &config::Config) -> Result<(), io::Error> {
 		let dir = config.dir.join(ftp.name.clone());
 		fs::create_dir(dir)?;
     }
-	println!("Directories create on {}", config.dir.display());
+	println!("Directories created on {}", config.dir.display());
     Ok(())
 }
 
@@ -37,7 +34,7 @@ struct Args {
     /// Path to config file.
     #[arg(short, long, default_value = "/usr/local/etc/ftp-mirror/ftp-mirror-config.yaml")]
     config: Arc<str>,
-    /// Enable and st]art service with the specified config.
+    /// Enable and start service with the specified config.
     #[command(subcommand)]
     command: Option<Commands>,
 }
