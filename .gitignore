@@ -18,6 +18,4 @@ Cargo.lock
 *.exe
 *.obj
 *.sum
-zig-cache/
-debian/ftp-mirror/usr/
 
